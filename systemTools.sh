@@ -271,15 +271,38 @@ echo "____________________________________________________|"
 return
 fi
 
-usermod -g $gr $nom
-usermod -md /home/usuarios/$gr/$nom $nom
+while [ 1 ]
+    do
 
-clear
-echo "Grupo asignado con éxito."
-read -p "Presionar cualquier tecla para continuar..." -n1 -s
-clear
-return
+    echo "  Asignar grupo como: "
+    echo 
+    echo "  1- Primario"
+    echo "  2- Secundario"
+    echo "  0- Cancelar"
+    echo 
 
+    read -p "Opcion: " tipoGrupo
+
+    case $tipoGrupo in
+        0)
+            clear
+            return
+        ;;
+
+        1)
+            usermod -g $gr $nom
+            usermod -md /home/usuarios/$gr/$nom $nom
+            clear
+            echo "Grupo asignado con éxito."
+            read -p "Presionar cualquier tecla para continuar..." -n1 -s
+            clear
+            return
+        ;;
+
+        2)
+        ;;
+    esac
+    done
 ;;
 
 4)
@@ -529,18 +552,15 @@ menuServicios(){
 clear
 while [ 1 ]
 do
-systemctl status sshd.service;
 echo _______________________________________________________________________________________________
 echo
 echo Qué desea hacer?
 echo
-echo "1- Activar SSH"
-echo "2- Desactivar SSH esta sesión"
-echo "3- Desactivar SSH"
-echo "4- Activar Backup (WIP)"
-echo "5- Desactivar Backup (WIP)"
+echo "1- SSH"
+echo "2- Respaldos"
 echo "0- Salir"
 echo
+
 read -p "Opción: " op
 case $op in
 0)
@@ -548,17 +568,11 @@ clear
 break
 ;;
 1)
-systemctl enable sshd.service;
-systemctl start sshd.service;
+menuSSH
 clear
 ;;
 2)
-systemctl stop sshd.service;
-clear
-;;
-3)
-systemctl disable sshd.service;
-clear
+menuRespaldos
 ;;
 *)
 echo "                                                 |"
@@ -569,11 +583,59 @@ esac
 done 
 }
 
+menuRespaldos(){
+
+clear
+while [ 1 ]
+do
+
+echo
+echo "¿Qué desea hacer?"
+echo
+echo "1- Activar respaldos"
+echo "2- Activar respaldos"
+echo "0- Salir"
+
+read -p "Opción: " op
+
+case $op in
+0)
+return
+;;
+1)
+echo "0 2 * * * root /root/Server-Management/backup.sh" >> /etc/crontab
+
+clear
+echo
+echo "             ! -  Respaldos Activados               |"
+echo "____________________________________________________|"
+echo
+;;
+2)
+cat /etc/crontab | grep -v "backup.sh" > /etc/tempCron
+cat /etc/tempCron > /etc/crontab
+rm -f /etc/tempCron
+
+clear
+echo
+echo "          ! -  Respaldos Desactivados               |"
+echo "____________________________________________________|"
+echo
+;;
+*)
+echo "                                                 |"
+echo "              ! - Opción no existente            |"
+echo "_________________________________________________|"
+;;
+esac
+done
+}
+
 Logs(){
 clear
 while [ 1 ]
 do
-echo "Qué logs desea ver?"
+echo "¿Qué logs desea ver?"
 echo 
 echo "1- Logins exitosos"
 echo "2- Logins no exitosos"
@@ -617,6 +679,57 @@ echo
 esac
 done
 }
+
+
+menuSSH(){
+clear
+while [ 1 ]
+do
+echo _______________________________________________________________________________________________
+echo
+echo ¿Qué desea hacer?
+echo
+echo "1- Activar SSH"
+echo "2- Desactivar SSH esta sesión"
+echo "3- Desactivar SSH"
+echo "4- Estado del SSH"
+echo "0- Salir"
+echo
+read -p "Opción: " op
+case $op in
+0)
+clear
+break
+;;
+1)
+systemctl enable sshd.service;
+systemctl start sshd.service;
+clear
+
+echo "                                                    |"
+echo "               ! - SSH Activado                     |"
+echo "____________________________________________________|"
+echo
+
+;;
+2)
+systemctl stop sshd.service;
+clear
+
+echo "                                                    |"
+echo "              ! - SSH Desactivado                   |"
+echo "____________________________________________________|"
+echo
+
+;;
+4)
+clear
+systemctl status sshd.service | grep -w "Active:"
+;;
+esac
+done
+}
+
 
 clear
 
@@ -667,10 +780,9 @@ do
 echo Herramientas del sistema
 echo 
 echo Qué desea hacer?
-echo "1- Alta, baja y modificación de usuarios y grupos"
-echo "2- Activar o desactivar servicios (WIP)"
-echo "3- Opciones de backup (NO IMPLEMENTADO)"
-echo "4- Ver logs"
+echo "1- ABMs"
+echo "2- Servicios"
+echo "3- Ver logs"
 echo "0- Salir"
 echo
 read -p "Opción: " op
@@ -686,12 +798,6 @@ menuABM
 menuServicios
 ;;
 3)
-clear
-echo "              ! - Opción no desarrollada.           |"
-echo "____________________________________________________|"
-echo
-;;
-4)
 Logs
 ;;
 *)
