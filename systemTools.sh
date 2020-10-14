@@ -405,8 +405,9 @@ echo "___________________________________________________|"
 echo
 return
 fi
-groupmod -n $newGR $gr
-c
+
+groupmod -n $newGr $gr
+
 echo "Grupo modificado con éxito."
 read -p "Presionar cualquier tecla para continuar..." -n1 -s
 clear
