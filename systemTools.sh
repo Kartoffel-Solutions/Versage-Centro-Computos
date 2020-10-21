@@ -282,34 +282,40 @@ mod()
             while [ 1 ]
                 do
 
-                echo "  Asignar grupo como: "
-                echo 
-                echo "  1- Primario"
-                echo "  2- Secundario"
-                echo "  0- Cancelar"
-                echo 
+                    echo "  Asignar grupo como: "
+                    echo 
+                    echo "  1- Primario"
+                    echo "  2- Secundario"
+                    echo "  0- Cancelar"
+                    echo 
 
-                read -p "Opcion: " tipoGrupo
+                    read -p "Opcion: " tipoGrupo
 
-                case $tipoGrupo in
-                    0)
-                        clear
-                        menuABM
-                    ;;
+                    case $tipoGrupo in
+                        0)
+                            clear
+                            mod
+                        ;;
 
-                    1)
-                        usermod -g $gr $nom
-                        usermod -md /home/usuarios/$gr/$nom $nom
-                        clear
-                        echo "Grupo asignado con éxito."
-                        read -p "Presionar cualquier tecla para continuar..." -n1 -s
-                        clear
-                        return
-                    ;;
+                        1)
+                            usermod -g $gr $nom
+                            usermod -md /home/usuarios/$gr/$nom $nom
+                            clear
+                            echo "Grupo primario cambiado con éxito."
+                            read -p "Presionar cualquier tecla para continuar..." -n1 -s
+                            clear
+                            return
+                        ;;
 
-                    2)
-                    ;;
-                esac
+                        2)
+                            usermod -G $gr $nom
+                            clear
+                            echo "Grupo secundario asignado con éxito"
+                            pause
+                            clear
+                            return
+                        ;;
+                    esac
                 done
             ;;
 
@@ -381,18 +387,18 @@ altgr()
     found=$(grep "$gr"":" /etc/group | awk -F ':' '{print $1}')
     if [ "$gr" = "" ]
     then
-    clear
-    echo "  ! - El nombre de grupo no puede estar en blanco.  |"
-    echo "____________________________________________________|"
-    return
+        clear
+        echo "  ! - El nombre de grupo no puede estar en blanco.  |"
+        echo "____________________________________________________|"
+        return
     fi
     if [ "$found" != "" ]
     then
-    clear
-    echo "    ! - El nombre de grupo ingresado ya existe.    |"
-    echo "___________________________________________________|"
-    echo
-    return
+        clear
+        echo "    ! - El nombre de grupo ingresado ya existe.    |"
+        echo "___________________________________________________|"
+        echo
+        return
     fi
     groupadd $gr
     mkdir "/home/usuarios/$gr"
@@ -410,36 +416,36 @@ modgr()
     found=$(grep "$gr"":" /etc/group | awk -F ':' '{print $1}')
     if [ "$gr" = "" ]
     then
-    clear
-    echo "  ! - El nombre de grupo no puede estar en blanco.  |"
-    echo "____________________________________________________|"
-    return
+        clear
+        echo "  ! - El nombre de grupo no puede estar en blanco.  |"
+        echo "____________________________________________________|"
+        return
     fi
     if [ "$found" = "" ]
     then
-    clear
-    echo "    ! - El nombre de grupo ingresado no existe.    |"
-    echo "___________________________________________________|"
-    echo
-    return
+        clear
+        echo "    ! - El nombre de grupo ingresado no existe.    |"
+        echo "___________________________________________________|"
+        echo
+        return
     fi
     read -p "Ingresar Nuevo Nombre de Grupo: " newGrX
     newGr=$(echo $newGrX | tr -d ' ')
     found=$(grep "$newGr"":" /etc/group | awk -F ':' '{print $1}')
     if [ "$newGr" = "" ]
     then
-    clear
-    echo "  ! - El nombre de grupo no puede estar en blanco.  |"
-    echo "____________________________________________________|"
-    return
+        clear
+        echo "  ! - El nombre de grupo no puede estar en blanco.  |"
+        echo "____________________________________________________|"
+        return
     fi
     if [ "$newGr" = "$found" ]
     then
-    clear
-    echo "    ! - El nombre de grupo ingresado ya existe.    |"
-    echo "___________________________________________________|"
-    echo
-    return
+        clear
+        echo "    ! - El nombre de grupo ingresado ya existe.    |"
+        echo "___________________________________________________|"
+        echo
+        return
     fi
 
     groupmod -n $newGr $gr
@@ -455,28 +461,32 @@ bajgr()
     read -p "Ingresar Nombre de Grupo a Eliminar: " grX
     gr=$(echo $grX | tr -d ' ')
     found=$(grep "$gr"":" /etc/group | awk -F ':' '{print $1}')
+
     if [ "$gr" = "" ]
     then
-    clear
-    echo "  ! - El nombre de grupo no puede estar en blanco.  |"
-    echo "____________________________________________________|"
-    return
+        clear
+        echo "  ! - El nombre de grupo no puede estar en blanco.  |"
+        echo "____________________________________________________|"
+        return
     fi
+
     if [ "$gr" == "administrador" ] || [ "$gr" == "medico" ]
     then
-    clear
-    echo "  ! - Eliminar grupos por defecto está prohibido.   |"
-    echo "____________________________________________________|"
-    return
+        clear
+        echo "  ! - Eliminar grupos por defecto está prohibido.   |"
+        echo "____________________________________________________|"
+        return
     fi
+
     if [ "$found" = "" ]
     then
     clear
-    echo "    ! - El nombre de grupo ingresado no existe.    |"
-    echo "___________________________________________________|"
-    echo
-    return
+        echo "    ! - El nombre de grupo ingresado no existe.    |"
+        echo "___________________________________________________|"
+        echo
+        return
     fi
+
     clear
     while [ 1 ]
     do
@@ -487,23 +497,25 @@ bajgr()
     echo
     read -p "Opción: " op
     clear
+
     if [ "$op" = "1" ]
     then
-    groupdel -f $gr
-    clear
-    echo "Grupo eliminado con éxito."
-    read -p "Presionar cualquier tecla para continuar..." -n1 -s
-    clear
-    return
+        groupdel -f $gr
+        clear
+        echo "Grupo eliminado con éxito."
+        read -p "Presionar cualquier tecla para continuar..." -n1 -s
+        clear
+        return
     else
-    if [ "$op" = "2" ]
-    then
-    return
-    fi
-    clear
-    echo "               ! - Opción no existente.             |"
-    echo "____________________________________________________|"
-    echo
+
+        if [ "$op" = "2" ]
+        then
+            return
+        fi
+        clear
+        echo "               ! - Opción no existente.             |"
+        echo "____________________________________________________|"
+        echo
     fi
     done
 }
@@ -597,99 +609,107 @@ menuServicios(){
 }
 
 menuRespaldos(){
-
     clear
     while [ 1 ]
     do
 
-    echo
-    echo "¿Qué desea hacer?"
-    echo
-    echo "1- Activar respaldos"
-    echo "2- Activar respaldos"
-    echo "0- Salir"
+        echo "|============================|"
+        echo "!         Respaldos          |"
+        echo "|     ¿Qué desea hacer?      |"
+        echo "|                            |"   
+        echo "|     1- Activar             |"
+        echo "|     2- Desactivar          |"
+        echo "|     3- Configurar          |"
+        echo "|     0- Salir               |"
+        echo "|                            |"
+        echo "|============================|"
 
-    read -p "Opción: " op
+        read -p "Opcion: " op
 
-    case $op in
-    0)
-    return
-    ;;
-    1)
-    echo "0 2 * * * root /root/Server-Management/backup.sh" >> /etc/crontab
+        case $op in
+            0)
+                return
+                ;;
+            1)
+                echo "0 2 * * * root /root/Server-Management/backup.sh" >> /etc/crontab
 
-    clear
-    echo
-    echo "             ! -  Respaldos Activados               |"
-    echo "____________________________________________________|"
-    echo
-    ;;
-    2)
-    cat /etc/crontab | grep -v "backup.sh" > /etc/tempCron
-    cat /etc/tempCron > /etc/crontab
-    rm -f /etc/tempCron
+                clear
+                echo
+                echo "             ! -  Respaldos Activados               |"
+                echo "____________________________________________________|"
+                echo
+                ;;
+            2)
+                cat /etc/crontab | grep -v "backup.sh" > /etc/tempCron
+                cat /etc/tempCron > /etc/crontab
+                rm -f /etc/tempCron
 
-    clear
-    echo
-    echo "          ! -  Respaldos Desactivados               |"
-    echo "____________________________________________________|"
-    echo
-    ;;
-    *)
-    echo "                                                 |"
-    echo "              ! - Opción no existente            |"
-    echo "_________________________________________________|"
-    ;;
-    esac
+                clear
+                echo
+                echo "          ! -  Respaldos Desactivados               |"
+                echo "____________________________________________________|"
+                echo
+                ;;
+            *)
+                echo "                                                 |"
+                echo "              ! - Opción no existente            |"
+                echo "_________________________________________________|"
+                ;;
+        esac
     done
 }
 
 Logs(){
     clear
     while [ 1 ]
-    do
-    echo "¿Qué logs desea ver?"
-    echo 
-    echo "1- Logins exitosos"
-    echo "2- Logins no exitosos"
-    echo "3- Todos los registros"
-    echo "0- Salir"
-    echo
-    read -p "Opción: " op
-    case $op in
-    0)
-    clear
-    break
-    ;;
-    1)
-    clear
-    grep -i 'opened' /var/log/secure
-    echo
-    read -p "Presionar cualquier tecla para continuar..." -n1 -s
-    clear
-    ;;
-    2)
-    clear
-    grep -Ei 'failed|failure' /var/log/secure
-    echo
-    read -p "Presionar cualquier tecla para continuar..." -n1 -s
-    clear
-    ;;
-    3)
-    clear
-    cat /var/log/secure
-    echo
-    read -p "Presionar cualquier tecla para continuar..." -n1 -s
-    clear
-    ;;
-    *)
-    clear
-    echo "                                                    |"
-    echo "               ! - Opción no existente.             |"
-    echo "____________________________________________________|"
-    echo
-    ;;
-    esac
+        do
+            echo "|============================|"
+            echo "!            Logs            |"
+            echo "|     ¿Qué logs desea ver?   |"
+            echo "|                            |"   
+            echo "|     1- Logins exitosos     |"
+            echo "|     2- Logins sin éxito    |"
+            echo "|     3- Todos               |"
+            echo "|     0- Salir               |"
+            echo "|                            |"
+            echo "|============================|"
+
+            read -p "Opción: " op
+
+            case $op in
+                0)
+                    clear
+                    break
+                    ;;
+                1)
+                    clear
+                    grep -i 'opened' /var/log/secure
+                    echo
+                    read -p "Presionar cualquier tecla para continuar..." -n1 -s
+                    clear
+                    ;;
+                2)
+                    clear
+                    grep -Ei 'failed|failure' /var/log/secure
+                    echo
+                    read -p "Presionar cualquier tecla para continuar..." -n1 -s
+                    clear
+                    ;;
+                3)
+                    clear
+                    cat /var/log/secure
+                    echo
+                    read -p "Presionar cualquier tecla para continuar..." -n1 -s
+                    clear
+                    ;;
+                *)
+                    clear
+                    echo "                                                    |"
+                    echo "               ! - Opción no existente.             |"
+                    echo "____________________________________________________|"
+                    echo
+                    ;;
+            esac
     done
 }
 
@@ -698,48 +718,49 @@ menuSSH(){
     clear
     while [ 1 ]
     do
-    echo _______________________________________________________________________________________________
-    echo
-    echo ¿Qué desea hacer?
-    echo
-    echo "1- Activar SSH"
-    echo "2- Desactivar SSH esta sesión"
-    echo "3- Desactivar SSH"
-    echo "4- Estado del SSH"
-    echo "0- Salir"
-    echo
-    read -p "Opción: " op
-    case $op in
-    0)
-    clear
-    break
-    ;;
-    1)
-    systemctl enable sshd.service;
-    systemctl start sshd.service;
-    clear
+        echo "|============================|"
+        echo "!                            |"
+        echo "|     ¿Qué desea hacer?      |"
+        echo "|                            |"   
+        echo "|     1- Activar             |"
+        echo "|     2- Desactivar          |"
+        echo "|     3- Estado              |"
+        echo "|     0- Salir               |"
+        echo "|                            |"
+        echo "|============================|"
 
-    echo "                                                    |"
-    echo "               ! - SSH Activado                     |"
-    echo "____________________________________________________|"
-    echo
+        read -p "Opción: " op
+        case $op in
+            0)
+                clear
+                break
+                ;;
+            1)
+                systemctl enable sshd.service;
+                systemctl start sshd.service;
+                clear
 
-    ;;
-    2)
-    systemctl stop sshd.service;
-    clear
+                echo "                                                    |"
+                echo "               ! - SSH Activado                     |"
+                echo "____________________________________________________|"
+                echo
 
-    echo "                                                    |"
-    echo "              ! - SSH Desactivado                   |"
-    echo "____________________________________________________|"
-    echo
+                ;;
+            2)
+                systemctl stop sshd.service;
+                clear
 
-    ;;
-    4)
-    clear
-    systemctl status sshd.service | grep -w "Active:"
-    ;;
-    esac
+                echo "                                                    |"
+                echo "              ! - SSH Desactivado                   |"
+                echo "____________________________________________________|"
+                echo
+
+                ;;
+            3)
+                clear
+                systemctl status sshd.service | grep -w "Active:"
+                ;;
+        esac
     done
 }
 
@@ -759,7 +780,7 @@ defaultConfiguration(){
     testMed=$(grep "medico"":" /etc/group | awk -F ':' '{print $1}')
 
     if [[ "$testAdmin" != "administrador" ]] || [[ "$testMed" != "medico" ]]
-        then
+    then
         groupadd administrador
         groupadd medico
         gruTest=1
