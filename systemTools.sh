@@ -619,7 +619,7 @@ menuRespaldos(){
         echo "|                            |"   
         echo "|     1- Activar             |"
         echo "|     2- Desactivar          |"
-        echo "|     3- Configurar          |"
+        echo "|     3- Respaldar ahora     |"
         echo "|     0- Salir               |"
         echo "|                            |"
         echo "|============================|"
@@ -628,6 +628,7 @@ menuRespaldos(){
 
         case $op in
             0)
+                clear
                 return
                 ;;
             1)
@@ -650,6 +651,14 @@ menuRespaldos(){
                 echo "____________________________________________________|"
                 echo
                 ;;
+            3)
+                ./backup.sh
+                clear
+                echo
+                echo "             ! -  Información Respaldada            |"
+                echo "____________________________________________________|"
+                
+                ;; 
             *)
                 echo "                                                 |"
                 echo "              ! - Opción no existente            |"
